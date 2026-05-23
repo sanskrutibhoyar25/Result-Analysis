@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Result Portal</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:Arial, Helvetica, sans-serif;
+            min-height:100vh;
+            background:linear-gradient(to bottom right,#dbeafe,#c7d2fe);
+        }
+
+        .fade-up{
+            animation:fadeUp .5s ease;
+        }
+
+        @keyframes fadeUp{
+            from{
+                opacity:0;
+                transform:translateY(20px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+        .spinner{
+            width:20px;
+            height:20px;
+            border:3px solid rgba(255,255,255,0.4);
+            border-top:3px solid white;
+            border-radius:50%;
+            animation:spin .8s linear infinite;
+        }
+
+        @keyframes spin{
+            from{transform:rotate(0deg);}
+            to{transform:rotate(360deg);}
+        }
+
+        .subject-card{
+            transition:0.3s;
+        }
+
+        .subject-card:hover{
+            transform:translateY(-5px);
+            box-shadow:0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar{
+            height:8px;
+            border-radius:10px;
+            background:linear-gradient(to right,#10b981,#3b82f6);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 fade-up">
+
+        <div class="text-center mb-8">
+
+            <div class="bg-blue-600 inline-flex p-4 rounded-full mb-4">
+                <i data-lucide="graduation-cap" class="text-white w-8 h-8"></i>
+            </div>
+
+            <h1 class="text-3xl font-bold text-gray-800">
+                Student Result Portal
+            </h1>
+
+            <p class="text-gray-500 mt-2">
+                Login to view results
+            </p>
+
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+
+            <div>
+                <label class="block font-semibold mb-2">
+                    Student Name
+                </label>
+
+                <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter name"
+                    class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
+                />
+
+                <p id="nameError" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-2">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="studentPassword"
+                    placeholder="Enter password"
+                    class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
+                />
+
+                <p id="passwordError" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <button
+                type="submit"
+                class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+            >
+                <span id="btnText">Login</span>
+                <span id="spinner" class="spinner hidden"></span>
+            </button>
+
+            <div id="loginError"
+                class="hidden bg-red-100 text-red-700 p-3 rounded-lg text-sm">
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- RESULT PAGE -->
+<div id="resultPage" class="hidden min-h-screen p-6">
+
+    <div class="max-w-5xl mx-auto">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8 fade-up">
+
+            <div>
+                <h1 id="welcomeText"
+                    class="text-4xl font-bold text-gray-800">
+                </h1>
+
+                <p class="text-gray-600 mt-1">
+                    Academic Results
+                </p>
+            </div>
+
+            <button
+                id="logoutBtn"
+                class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg flex items-center gap-2"
+            >
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                Logout
+            </button>
+
+        </div>
+
+        <!-- OVERALL CARDS -->
+        <div class="grid md:grid-cols-4 gap-5 mb-8">
+
+            <div class="bg-white rounded-xl p-5 shadow-lg">
+                <p class="text-gray-500 text-sm mb-1">Average Score</p>
+                <h2 id="averageScore"
+                    class="text-3xl font-bold text-green-600">
+                </h2>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 shadow-lg">
+                <p class="text-gray-500 text-sm mb-1">Percentage</p>
+                <h2 id="averagePercentage"
+                    class="text-3xl font-bold text-blue-600">
+                </h2>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 shadow-lg">
+                <p class="text-gray-500 text-sm mb-1">Total Subjects</p>
+                <h2 id="totalSubjects"
+                    class="text-3xl font-bold text-indigo-600">
+                </h2>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 shadow-lg">
+                <p class="text-gray-500 text-sm mb-1">Total Marks</p>
+                <h2 id="totalMarks"
+                    class="text-3xl font-bold text-pink-600">
+                </h2>
+            </div>
+
+        </div>
+
+        <!-- SUBJECT CARDS -->
+        <div id="subjectsContainer"
+            class="grid md:grid-cols-2 gap-6">
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    // Student Data
+    const students = [
+
+        {
+            name:"Sanskruti Bhoyar",
+            password:"sanskruti123",
+
+            subjects:[
+                {name:"Java Programming",score:88,total:100},
+                {name:"FLLM",score:82,total:100},
+                {name:"DAA",score:90,total:100},
+                {name:"Python",score:85,total:100},
+                {name:"SPM",score:87,total:100},
+                {name:"JDCAP",score:92,total:100}
+            ]
+        },
+
+        {
+            name:"Rutika Bhoyar",
+            password:"rutika456",
+
+            subjects:[
+                {name:"Java Programming",score:91,total:100},
+                {name:"FLLM",score:86,total:100},
+                {name:"DAA",score:89,total:100},
+                {name:"Python",score:84,total:100},
+                {name:"SPM",score:88,total:100},
+                {name:"JDCAP",score:94,total:100}
+            ]
+        },
+
+        {
+            name:"Shreyash Chavhan",
+            password:"shreyash789",
+
+            subjects:[
+                {name:"Java Programming",score:79,total:100},
+                {name:"FLLM",score:75,total:100},
+                {name:"DAA",score:81,total:100},
+                {name:"Python",score:77,total:100},
+                {name:"SPM",score:80,total:100},
+                {name:"JDCAP",score:83,total:100}
+            ]
+        }
+
+    ];
+
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", function(e){
+
+        e.preventDefault();
+
+        const name = document.getElementById("studentName").value.trim();
+        const password = document.getElementById("studentPassword").value.trim();
+
+        document.getElementById("nameError").classList.add("hidden");
+        document.getElementById("passwordError").classList.add("hidden");
+        document.getElementById("loginError").classList.add("hidden");
+
+        if(name === ""){
+            const err = document.getElementById("nameError");
+            err.innerText = "Name is required";
+            err.classList.remove("hidden");
+            return;
+        }
+
+        if(password === ""){
+            const err = document.getElementById("passwordError");
+            err.innerText = "Password is required";
+            err.classList.remove("hidden");
+            return;
+        }
+
+        // Loading State
+        document.getElementById("spinner").classList.remove("hidden");
+        document.getElementById("btnText").innerText = "Logging in...";
+
+        setTimeout(() => {
+
+            const student = students.find(s =>
+                s.name.toLowerCase() === name.toLowerCase()
+                && s.password === password
+            );
+
+            if(student){
+                localStorage.setItem("student", JSON.stringify(student));
+                showResults(student);
+            }
+            else{
+                const error = document.getElementById("loginError");
+
+                error.innerText =
+                    "Invalid name or password";
+
+                error.classList.remove("hidden");
+            }
+
+            document.getElementById("spinner").classList.add("hidden");
+            document.getElementById("btnText").innerText = "Login";
+
+        },800);
+
+    });
+
+    function showResults(student){
+
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("resultPage").classList.remove("hidden");
+
+        document.getElementById("welcomeText").innerText =
+            `Welcome, ${student.name}!`;
+
+        const totalScore = student.subjects.reduce(
+            (sum,s)=>sum+s.score,0
+        );
+
+        const totalMarks = student.subjects.reduce(
+            (sum,s)=>sum+s.total,0
+        );
+
+        const avg = Math.round(totalScore/student.subjects.length);
+
+        document.getElementById("averageScore").innerText = avg;
+        document.getElementById("averagePercentage").innerText = avg+"%";
+        document.getElementById("totalSubjects").innerText =
+            student.subjects.length;
+
+        document.getElementById("totalMarks").innerText =
+            `${totalScore}/${totalMarks}`;
+
+        const container = document.getElementById("subjectsContainer");
+
+        container.innerHTML = "";
+
+        student.subjects.forEach((subject,index)=>{
+
+            const percent = Math.round(
+                (subject.score/subject.total)*100
+            );
+
+            let grade = "";
+
+            if(percent >= 90) grade = "A+";
+            else if(percent >= 80) grade = "A";
+            else if(percent >= 70) grade = "B";
+            else if(percent >= 60) grade = "C";
+            else grade = "F";
+
+            const card = document.createElement("div");
+
+            card.className =
+                "bg-white rounded-xl shadow-lg p-6 subject-card fade-up";
+
+            card.style.animationDelay = `${index * 0.1}s`;
+
+            card.innerHTML = `
+
+                <div class="flex justify-between items-center mb-4">
+
+                    <h2 class="text-xl font-bold text-gray-800">
+                        ${subject.name}
+                    </h2>
+
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
+                        ${percent}%
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <div class="flex justify-between text-sm mb-2">
+
+                        <span class="text-gray-600">
+                            Marks
+                        </span>
+
+                        <span class="font-bold text-green-600">
+                            ${subject.score}/${subject.total}
+                        </span>
+
+                    </div>
+
+                    <div class="w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div class="progress-bar"
+                            style="width:${percent}%">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-between mt-4 text-sm">
+
+                    <span class="font-bold text-indigo-600">
+                        Grade: ${grade}
+                    </span>
+
+                    <span class="text-gray-500">
+                        ${percent >= 90 ? "Excellent" :
+                          percent >= 75 ? "Good" :
+                          percent >= 60 ? "Pass" :
+                          "Fail"}
+                    </span>
+
+                </div>
+
+            `;
+
+            container.appendChild(card);
+
+        });
+
+        lucide.createIcons();
+    }
+
+    // Logout
+    document.getElementById("logoutBtn")
+    .addEventListener("click",()=>{
+
+        localStorage.removeItem("student");
+
+        document.getElementById("resultPage")
+        .classList.add("hidden");
+
+        document.getElementById("loginPage")
+        .classList.remove("hidden");
+
+        document.getElementById("studentName").value = "";
+        document.getElementById("studentPassword").value = "";
+
+    });
+
+    // Auto Login
+    window.onload = () => {
+
+        const saved = localStorage.getItem("student");
+
+        if(saved){
+            showResults(JSON.parse(saved));
+        }
+
+        lucide.createIcons();
+    };
+
+</script>
+
+</body>
+</html>
